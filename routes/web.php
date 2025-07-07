@@ -14,3 +14,20 @@ use Illuminate\Support\Facades\Mail;
 |
 */
 
+Route::get('/', function () {
+    return view('home');
+});
+
+Route::get('/company', function () {
+    return view('company');
+});
+
+Route::get('/service', function () {
+    return view('service');
+});
+
+Route::get('/quote', [App\Http\Controllers\QuoteController::class, 'show'])->name('quote');
+Route::post('/quote', [App\Http\Controllers\QuoteController::class, 'send'])->name('quote.send');
+
+Route::get('/contact', [App\Http\Controllers\ContactController::class, 'show'])->name('contact');
+Route::post('/contact', [App\Http\Controllers\ContactController::class, 'send'])->name('contact.send');

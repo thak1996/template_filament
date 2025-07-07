@@ -92,7 +92,7 @@ MAIL_PORT_WEB=8025
 MAIL_USERNAME=null
 MAIL_PASSWORD=null
 MAIL_ENCRYPTION=null
-MAIL_FROM_ADDRESS="contato@fdslogistica.com.br"
+MAIL_FROM_ADDRESS="e-mail@exemplo.com"
 MAIL_FROM_NAME="FDS Logística"
 MAIL_COPY_ADDRESS="seu-email@exemplo.com"
 
@@ -176,10 +176,10 @@ docker-compose down
 docker-compose logs -f
 
 # Executar comandos Laravel
-docker-compose exec laravel.test php artisan [comando]
+docker-compose exec app php artisan [comando]
 
 # Acessar container Laravel
-docker-compose exec laravel.test bash
+docker-compose exec app bash
 ```
 
 ### Laravel Artisan

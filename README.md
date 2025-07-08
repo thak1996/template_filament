@@ -268,7 +268,7 @@ docker-compose exec laravel.test php artisan view:clear
 | Variável | Descrição | Exemplo |
 |----------|-----------|---------|
 | `APP_PORT` | Porta da aplicação | `8080` |
-| `MAIL_FROM_ADDRESS` | E-mail remetente | `contato@fdslogistica.com.br` |
+| `MAIL_FROM_ADDRESS` | E-mail remetente | `exemplo@exemplo.com` |
 | `MAIL_COPY_ADDRESS` | E-mail para receber cópias | `seu-email@exemplo.com` |
 | `DB_HOST` | Host do banco (Docker) | `mysql` |
 | `MAIL_HOST` | Host do e-mail (Docker) | `mailpit` |

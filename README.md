@@ -256,7 +256,7 @@ APP_PORT=8081
 npm run build
 
 # Limpe o cache do Laravel
-docker-compose exec laravel.test php artisan view:clear
+docker-compose exec app php artisan view:clear
 ```
 
 ### E-mails não chegam

@@ -1,16 +1,13 @@
 FROM serversideup/php:8.2-fpm-nginx
 
-# Define o diretório de trabalho
 WORKDIR /var/www/html
 
-# Copia os arquivos do projeto
-COPY . .
+# O TRUQUE ESTÁ AQUI: --chown=webuser:webgroup
+# Isso copia os arquivos já dando permissão para o usuário do servidor
+COPY --chown=webuser:webgroup . .
 
-# Instala dependências do PHP
+# Instala dependências do PHP (agora sem erro de permissão)
 RUN composer install --no-dev --optimize-autoloader
 
-# Instala dependências do Node e compila o front-end (Vite)
+# Instala dependências do Node e compila o front-end
 RUN npm install && npm run build
-
-# Corrige permissões para o usuário do container
-RUN chown -R webuser:webgroup /var/www/html

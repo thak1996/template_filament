@@ -13,18 +13,18 @@ enum PanelRole: string implements HasLabel
     public function getLabel(): ?string
     {
         return match ($this) {
-            self::SUPER_ADMIN => 'Super Administrador',
-            self::ADMIN => 'Administrador',
-            self::USER => 'Usuário Padrão',
+            self::SUPER_ADMIN => __('panel_roles.super_admin'),
+            self::ADMIN => __('panel_roles.admin'),
+            self::USER => __('panel_roles.user'),
         };
     }
 
     public function getLabelUsersTable(): ?string
     {
         return match ($this) {
-            self::SUPER_ADMIN => 'S.Admin',
-            self::ADMIN => 'Admin',
-            self::USER => 'Usuário',
+            self::SUPER_ADMIN => __('panel_roles.s_admin'),
+            self::ADMIN => __('panel_roles.admin_short'),
+            self::USER => __('panel_roles.user_short'),
         };
     }
 }

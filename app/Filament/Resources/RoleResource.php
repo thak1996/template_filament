@@ -64,10 +64,15 @@ class RoleResource extends Resource
                                             ->bulkToggleable()
                                             ->columns(2)
                                             ->gridDirection('row')
-
+                                            ->disabled(
+                                                fn($record) =>
+                                                $record && $record->name === PanelRole::SUPER_ADMIN->value
+                                            )
                                             ->formatStateUsing(function ($record) use ($permissionsDoGrupo) {
-                                                if (!$record)
-                                                    return [];
+                                                if (!$record) return [];
+                                                if ($record->name === PanelRole::SUPER_ADMIN->value) {
+                                                    return $permissionsDoGrupo->pluck('id')->toArray();
+                                                }
                                                 return $record->permissions
                                                     ->whereIn('id', $permissionsDoGrupo->pluck('id'))
                                                     ->pluck('id')
@@ -76,6 +81,7 @@ class RoleResource extends Resource
                                             ->dehydrated(false),
                                     ])
                                     ->collapsible()
+                                    ->collapsed()
                                     ->compact())->toArray();
                             })
                             ->columnSpanFull(),
@@ -110,7 +116,16 @@ class RoleResource extends Resource
                     ->counts('permissions')
                     ->label('Permissões')
                     ->badge()
-                    ->color('info'),
+                    ->formatStateUsing(function ($state, Role $record) {
+                        if ($record->name === PanelRole::SUPER_ADMIN->value) {
+                            return Permission::count();
+                        }
+                        return $state;
+                    })
+                    ->color(
+                        fn(Role $record) =>
+                        $record->name === PanelRole::SUPER_ADMIN->value ? 'success' : 'info'
+                    ),
 
                 TextColumn::make('created_at')
                     ->dateTime('d/m/Y')

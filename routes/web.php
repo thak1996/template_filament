@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Session;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,3 +31,14 @@ Route::post('/quote', [App\Http\Controllers\QuoteController::class, 'send'])->na
 
 Route::get('/contact', [App\Http\Controllers\ContactController::class, 'show'])->name('contact');
 Route::post('/contact', [App\Http\Controllers\ContactController::class, 'send'])->name('contact.send');
+
+
+Route::get('/lang/{locale}', function ($locale) {
+    if (! in_array($locale, ['en', 'pt_BR'])) {
+        abort(400);
+    }
+
+    Session::put('locale', $locale);
+
+    return back();
+})->name('switch-language');

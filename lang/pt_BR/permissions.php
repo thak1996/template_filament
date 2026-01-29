@@ -14,9 +14,9 @@ return [
     'roles_delete' => 'Excluir Cargos',
 
     // Traduções
-    'translations_view'   => 'Ver Traduções do Sistema',
-    'translations_create' => 'Criar Novas Chaves de Texto',
-    'translations_edit'   => 'Traduzir/Editar Textos',
+    'translations_view'   => 'Visualizar Traduções',
+    'translations_create' => 'Criar Traduções',
+    'translations_edit'   => 'Editar Traduções',
 
     // Geral
     'dashboard_view' => 'Acessar Painel Principal (Dashboard)',

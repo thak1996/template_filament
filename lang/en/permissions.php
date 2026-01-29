@@ -14,9 +14,9 @@ return [
     'roles_delete' => 'Delete Roles',
 
     // Translations
-    'translations_view'   => 'View System Translations',
-    'translations_create' => 'Create New Text Keys',
-    'translations_edit'   => 'Translate/Edit Texts',
+    'translations_view'   => 'View Translations',
+    'translations_create' => 'Create Translations',
+    'translations_edit'   => 'Edit Translations',
 
     // General
     'dashboard_view' => 'Access Main Dashboard',

@@ -5,7 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
-use App\Enums\PanelRole; // Importante: Seu Enum
+use App\Enums\PanelRole;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -58,8 +58,8 @@ class UserResource extends Resource
                 TextInput::make('password')
                     ->password()
                     ->label('Senha')
-                    ->dehydrateStateUsing(Hash::make(...))
-                    ->dehydrated(filled(...))
+                    ->dehydrateStateUsing(fn($state) => Hash::make($state))
+                    ->dehydrated(fn($state) => filled($state))
                     ->required(fn(string $context): bool => $context === 'create'),
             ]);
     }

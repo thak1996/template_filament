@@ -1,11 +1,11 @@
 services:
-    app:
+    laravel.test:
         build:
-            context: './vendor/laravel/sail/runtimes/8.4'
+            context: ./vendor/laravel/sail/runtimes/8.4
             dockerfile: Dockerfile
             args:
                 WWWGROUP: '${WWWGROUP}'
-        image: 'sail-8.4/app'
+        image: sail-8.4/app
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:
@@ -50,18 +50,8 @@ services:
     mailpit:
         image: axllent/mailpit
         ports:
-        - "${MAIL_PORT_WEB}:8025"
-        - "${MAIL_PORT}:1025"
-        networks:
-        - sail
-    ngrok:
-        image: ngrok/ngrok:latest
-        container_name: ngrok_tunnel
-        command: start --config /etc/ngrok/ngrok.yml --log stdout --log-format=term --all
-        volumes:
-            - ./ngrok/ngrok.yml:/etc/ngrok/ngrok.yml
-        depends_on:
-            - app
+            - '${MAIL_PORT_WEB}:8025'
+            - '${MAIL_PORT}:1025'
         networks:
             - sail
 networks:

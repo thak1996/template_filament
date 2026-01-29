@@ -44,10 +44,16 @@ class CreateUser extends CreateRecord
             $user->syncPermissions($permissionIds);
         }
 
-        Mail::send([], [], function ($message) use ($user) {
-            $message->to($user->email)
-                ->subject('Acesso ao Sistema')
-                ->html("Olá <b>{$user->name}</b>,<br><br>Seu acesso foi criado.<br>Senha: <b>{$this->plainPassword}</b><br><br>Faça login e altere sua senha.");
+        $emailData = [
+            'name' => $user->name,
+            'email' => $user->email,
+            'password' => $this->plainPassword,
+            'url' => filament()->getLoginUrl(),
+        ];
+
+        Mail::send('emails.register', $emailData, function ($message) use ($user) {
+            $message->to($user->email, $user->name)
+                ->subject('Credenciais de Acesso - ' . config('app.name'));
         });
     }
 }

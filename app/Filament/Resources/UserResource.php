@@ -39,7 +39,7 @@ class UserResource extends Resource
                     ->maxLength(255),
 
                 Select::make('roles')
-                    ->label('Cargo / Função')
+                    ->label('Função')
                     ->relationship('roles', 'name', modifyQueryUsing: function (Builder $query) {
                         if (! Auth::user()->hasRole(PanelRole::SUPER_ADMIN->value)) {
                             return $query->where('name', '!=', PanelRole::SUPER_ADMIN->value);
@@ -74,9 +74,6 @@ class UserResource extends Resource
                     ->label('Nome')
                     ->searchable(),
 
-                TextColumn::make('email')
-                    ->searchable(),
-
                 TextColumn::make('roles.name')
                     ->label('Cargo')
                     ->badge()
@@ -86,23 +83,40 @@ class UserResource extends Resource
                         PanelRole::USER->value => 'success',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn($state) => PanelRole::tryFrom($state)?->getLabelUsersTable() ?? $state),
+                    ->formatStateUsing(fn($state) => PanelRole::tryFrom($state)?->getLabelUsersTable() ?? $state)
+                    ->searchable(),
 
-                TextColumn::make('created_at')
-                    ->dateTime('d/m/Y')
-                    ->label('Criado em')
-                    ->sortable(),
+
+                TextColumn::make('email')
+                    ->searchable(),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->hidden(function (User $record) {
+                        if ($record->id === Auth::id()) {
+                            return true;
+                        }
+                        if ($record->id === 1) {
+                            return true;
+                        }
+                        return false;
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->action(function (Tables\Actions\DeleteBulkAction $action, \Illuminate\Database\Eloquent\Collection $records) {
+                            $records = $records->reject(fn($user) => $user->id === Auth::id());
+                            $records->each->delete();
+                            \Filament\Notifications\Notification::make()
+                                ->title('Registros excluídos')
+                                ->success()
+                                ->send();
+                        }),
                 ]),
             ]);
     }

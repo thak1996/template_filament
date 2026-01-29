@@ -13,7 +13,7 @@ enum PanelRole: string implements HasLabel
     public function getLabel(): ?string
     {
         return match ($this) {
-            self::SUPER_ADMIN => 'Super Administrador (Dono)',
+            self::SUPER_ADMIN => 'Super Administrador',
             self::ADMIN => 'Administrador',
             self::USER => 'Usuário Padrão',
         };

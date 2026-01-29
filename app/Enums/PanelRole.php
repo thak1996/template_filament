@@ -18,4 +18,13 @@ enum PanelRole: string implements HasLabel
             self::USER => 'Usuário Padrão',
         };
     }
+
+    public function getLabelUsersTable(): ?string
+    {
+        return match ($this) {
+            self::SUPER_ADMIN => 'S.Admin',
+            self::ADMIN => 'Admin',
+            self::USER => 'Usuário',
+        };
+    }
 }

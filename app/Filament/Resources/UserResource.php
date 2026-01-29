@@ -32,11 +32,6 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('name')
-                    ->label('Nome Completo')
-                    ->required()
-                    ->maxLength(255),
-
                 TextInput::make('email')
                     ->email()
                     ->required()
@@ -51,16 +46,13 @@ class UserResource extends Resource
                         }
                         return $query;
                     })
+                    ->getOptionLabelFromRecordUsing(
+                        fn($record) =>
+                        PanelRole::tryFrom($record->name)?->getLabel() ?? $record->name
+                    )
                     ->multiple()
                     ->preload()
                     ->searchable(),
-
-                TextInput::make('password')
-                    ->password()
-                    ->label('Senha')
-                    ->dehydrateStateUsing(fn($state) => Hash::make($state))
-                    ->dehydrated(fn($state) => filled($state))
-                    ->required(fn(string $context): bool => $context === 'create'),
             ]);
     }
 
@@ -93,7 +85,8 @@ class UserResource extends Resource
                         PanelRole::ADMIN->value => 'warning',
                         PanelRole::USER->value => 'success',
                         default => 'gray',
-                    }),
+                    })
+                    ->formatStateUsing(fn($state) => PanelRole::tryFrom($state)?->getLabelUsersTable() ?? $state),
 
                 TextColumn::make('created_at')
                     ->dateTime('d/m/Y')

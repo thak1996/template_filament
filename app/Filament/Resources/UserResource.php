@@ -26,7 +26,7 @@ class UserResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-users';
     protected static ?string $navigationGroup = 'Administração';
 
-    protected static ?int $navigationSort = 0; 
+    protected static ?int $navigationSort = 0;
 
     public static function form(Form $form): Form
     {
@@ -43,13 +43,10 @@ class UserResource extends Resource
                     ->unique(ignoreRecord: true)
                     ->maxLength(255),
 
-                // SELEÇÃO DE CARGOS COM PROTEÇÃO
                 Select::make('roles')
                     ->label('Cargo / Função')
                     ->relationship('roles', 'name', modifyQueryUsing: function (Builder $query) {
-                        // Se quem está logado NÃO É Super Admin...
                         if (! Auth::user()->hasRole(PanelRole::SUPER_ADMIN->value)) {
-                            // ... Esconde o cargo 'Super Admin' da lista de opções.
                             return $query->where('name', '!=', PanelRole::SUPER_ADMIN->value);
                         }
                         return $query;
@@ -58,12 +55,11 @@ class UserResource extends Resource
                     ->preload()
                     ->searchable(),
 
-                // SENHA COM CRIPTOGRAFIA AUTOMÁTICA
                 TextInput::make('password')
                     ->password()
                     ->label('Senha')
-                    ->dehydrateStateUsing(fn($state) => Hash::make($state))
-                    ->dehydrated(fn($state) => filled($state))
+                    ->dehydrateStateUsing(Hash::make(...))
+                    ->dehydrated(filled(...))
                     ->required(fn(string $context): bool => $context === 'create'),
             ]);
     }
@@ -71,6 +67,16 @@ class UserResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query) {
+                $user = Auth::user();
+                $superAdminRole = PanelRole::SUPER_ADMIN->value;
+                if (! $user->hasRole($superAdminRole)) {
+                    return $query->whereDoesntHave('roles', function ($q) use ($superAdminRole) {
+                        $q->where('name', $superAdminRole);
+                    });
+                }
+                return $query;
+            })
             ->columns([
                 TextColumn::make('name')
                     ->label('Nome')
@@ -79,7 +85,6 @@ class UserResource extends Resource
                 TextColumn::make('email')
                     ->searchable(),
 
-                // EXIBE OS CARGOS COM AS MESMAS CORES DO ENUM
                 TextColumn::make('roles.name')
                     ->label('Cargo')
                     ->badge()
@@ -100,7 +105,6 @@ class UserResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                // Opcional: Esconder delete se o usuário alvo for Super Admin
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([

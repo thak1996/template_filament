@@ -6,9 +6,9 @@ use Filament\Support\Contracts\HasLabel;
 
 enum PanelRole: string implements HasLabel
 {
-    case SUPER_ADMIN = 'Super Admin';
-    case ADMIN = 'Admin';
-    case USER = 'Usuário';
+    case SUPER_ADMIN = 'super_admin';
+    case ADMIN = 'admin';
+    case USER = 'user';
 
     public function getLabel(): ?string
     {

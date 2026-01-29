@@ -3,19 +3,22 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\RoleResource\Pages;
-use App\Filament\Resources\RoleResource\RelationManagers;
-use App\Enums\PanelRole; // Importante: Seu Enum
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Columns\TextColumn;
+use App\Enums\PanelRole;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\Group;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class RoleResource extends Resource
 {
@@ -23,19 +26,60 @@ class RoleResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
     protected static ?string $navigationGroup = 'Administração';
-
-    protected static ?int $navigationSort = 1; 
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                TextInput::make('name')
-                    ->label('Nome do Cargo')
-                    ->required()
-                    ->unique(ignoreRecord: true)
-                    ->minLength(2)
-                    ->maxLength(255),
+                Section::make('Identificação')
+                    ->description('Defina o nome do cargo.')
+                    ->schema([
+                        TextInput::make('name')
+                            ->label('Nome do Cargo')
+                            ->required()
+                            ->unique(ignoreRecord: true)
+                            ->minLength(2)
+                            ->maxLength(255)
+                            ->disabled(
+                                fn(?Role $record) =>
+                                $record && in_array($record->name, array_column(PanelRole::cases(), 'value'))
+                            ),
+                    ]),
+
+                Section::make('Permissões de Acesso')
+                    ->description('Selecione as funcionalidades permitidas para este cargo.')
+                    ->schema([
+                        Group::make()
+                            ->schema(function () {
+                                $permissions = Permission::all();
+
+                                $groups = $permissions->groupBy(fn($perm) => Str::before($perm->name, '_'));
+
+                                return $groups->map(fn($permissionsDoGrupo, $nomeDoGrupo) => Section::make(Str::ucfirst($nomeDoGrupo))
+                                    ->schema([
+                                        CheckboxList::make('permissions_' . $nomeDoGrupo)
+                                            ->label('')
+                                            ->options($permissionsDoGrupo->pluck('name', 'id'))
+                                            ->bulkToggleable()
+                                            ->columns(2)
+                                            ->gridDirection('row')
+
+                                            ->formatStateUsing(function ($record) use ($permissionsDoGrupo) {
+                                                if (!$record)
+                                                    return [];
+                                                return $record->permissions
+                                                    ->whereIn('id', $permissionsDoGrupo->pluck('id'))
+                                                    ->pluck('id')
+                                                    ->toArray();
+                                            })
+                                            ->dehydrated(false),
+                                    ])
+                                    ->collapsible()
+                                    ->compact())->toArray();
+                            })
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
@@ -50,7 +94,6 @@ class RoleResource extends Resource
             })
             ->columns([
                 TextColumn::make('id')->sortable(),
-
                 TextColumn::make('name')
                     ->label('Cargo')
                     ->searchable()
@@ -63,32 +106,21 @@ class RoleResource extends Resource
                         default => 'gray',
                     }),
 
+                TextColumn::make('permissions_count')
+                    ->counts('permissions')
+                    ->label('Permissões')
+                    ->badge()
+                    ->color('info'),
+
                 TextColumn::make('created_at')
-                    ->dateTime('d/m/Y H:i')
-                    ->label('Criado em'),
-            ])
-            ->filters([
-                //
+                    ->dateTime('d/m/Y')
+                    ->label('Criado em')
+                    ->sortable(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-
-                // ESCONDE O BOTÃO DELETAR PARA CARGOS DO SISTEMA
                 Tables\Actions\DeleteAction::make()
-                    ->hidden(function (Role $record) {
-                        $cargosDoSistema = array_column(PanelRole::cases(), 'value');
-                        return in_array($record->name, $cargosDoSistema);
-                    }),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
-                        // Opcional: Impedir deletar em massa também
-                        ->action(function () {
-                            // Lógica avançada omitida para manter simplicidade, 
-                            // mas o ideal é filtrar aqui também.
-                        }),
-                ]),
+                    ->hidden(fn(Role $record) => in_array($record->name, array_column(PanelRole::cases(), 'value'))),
             ]);
     }
 

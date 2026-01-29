@@ -25,18 +25,37 @@ class RoleResource extends Resource
     protected static ?string $model = Role::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
-    protected static ?string $navigationGroup = 'Administração';
     protected static ?int $navigationSort = 1;
+
+    public static function getModelLabel(): string
+    {
+        return __('resources.roles.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('resources.roles.plural_label');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('resources.roles.navigation');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('permissions.settings_view');
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Section::make('Identificação')
-                    ->description('Defina o nome do cargo.')
+                Section::make(__('resources.roles.identification_title'))
+                    ->description(__('resources.roles.identification_description'))
                     ->schema([
                         TextInput::make('name')
-                            ->label('Nome do Cargo')
+                            ->label(__('resources.roles.identification_name_label'))
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->minLength(2)
@@ -47,8 +66,8 @@ class RoleResource extends Resource
                             ),
                     ]),
 
-                Section::make('Permissões de Acesso')
-                    ->description('Selecione as funcionalidades permitidas para este cargo.')
+                Section::make(__('resources.roles.permissions_title'))
+                    ->description(__('resources.roles.permissions_description'))
                     ->schema([
                         Group::make()
                             ->schema(function () {
@@ -101,7 +120,7 @@ class RoleResource extends Resource
             ->columns([
                 TextColumn::make('id')->sortable(),
                 TextColumn::make('name')
-                    ->label('Cargo')
+                    ->label(__('resources.roles.table_name_label'))
                     ->searchable()
                     ->sortable()
                     ->badge()
@@ -114,7 +133,7 @@ class RoleResource extends Resource
 
                 TextColumn::make('permissions_count')
                     ->counts('permissions')
-                    ->label('Permissões')
+                    ->label(__('resources.roles.table_permissions_count_label'))
                     ->badge()
                     ->formatStateUsing(function ($state, Role $record) {
                         if ($record->name === PanelRole::SUPER_ADMIN->value) {
@@ -129,7 +148,7 @@ class RoleResource extends Resource
 
                 TextColumn::make('created_at')
                     ->dateTime('d/m/Y')
-                    ->label('Criado em')
+                    ->label(__('resources.roles.table_created_at_label'))
                     ->sortable(),
             ])
             ->actions([

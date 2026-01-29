@@ -18,20 +18,29 @@ use Filament\Tables\Filters\SelectFilter;
 
 class LanguageLineResource extends Resource
 {
-    // Lembre-se de importar o Model do pacote Spatie lá em cima
     protected static ?string $model = LanguageLine::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-language';
     protected static ?int $navigationSort = 2;
 
+    public static function getModelLabel(): string
+    {
+        return __('resources.translations.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('resources.translations.plural_label');
+    }
+
     public static function getNavigationLabel(): string
     {
-        return __('language_line_resource.navigation_label');
+        return __('resources.translations.navigation');
     }
 
     public static function getNavigationGroup(): ?string
     {
-        return __('language_line_resource.navigation_group');
+        return __('permissions.settings_view');
     }
 
     public static function form(Form $form): Form

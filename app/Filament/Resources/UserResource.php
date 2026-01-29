@@ -24,22 +24,42 @@ class UserResource extends Resource
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
-    protected static ?string $navigationGroup = 'Administração';
 
     protected static ?int $navigationSort = 0;
+
+    public static function getModelLabel(): string
+    {
+        return __('resources.users.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('resources.users.plural_label');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('resources.users.navigation');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('permissions.settings_view');
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 TextInput::make('email')
+                    ->label(__('user_resource.form_email_label'))
                     ->email()
                     ->required()
                     ->unique(ignoreRecord: true)
                     ->maxLength(255),
 
                 Select::make('roles')
-                    ->label('Função')
+                    ->label(__('user_resource.form_roles_label'))
                     ->relationship('roles', 'name', modifyQueryUsing: function (Builder $query) {
                         if (! Auth::user()->hasRole(PanelRole::SUPER_ADMIN->value)) {
                             return $query->where('name', '!=', PanelRole::SUPER_ADMIN->value);
@@ -71,11 +91,11 @@ class UserResource extends Resource
             })
             ->columns([
                 TextColumn::make('name')
-                    ->label('Nome')
+                    ->label(__('user_resource.table_name_label'))
                     ->searchable(),
 
                 TextColumn::make('roles.name')
-                    ->label('Cargo')
+                    ->label(__('user_resource.table_roles_label'))
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         PanelRole::SUPER_ADMIN->value => 'danger',
@@ -88,6 +108,7 @@ class UserResource extends Resource
 
 
                 TextColumn::make('email')
+                    ->label(__('user_resource.table_email_label'))
                     ->searchable(),
             ])
             ->filters([
@@ -113,7 +134,7 @@ class UserResource extends Resource
                             $records = $records->reject(fn($user) => $user->id === Auth::id());
                             $records->each->delete();
                             \Filament\Notifications\Notification::make()
-                                ->title('Registros excluídos')
+                                ->title(__('user_resource.records_deleted'))
                                 ->success()
                                 ->send();
                         }),

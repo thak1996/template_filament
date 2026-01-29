@@ -20,4 +20,6 @@ return [
 
     // Geral
     'dashboard_view' => 'Acessar Painel Principal (Dashboard)',
+
+    'settings_view' => 'Administração',
 ];

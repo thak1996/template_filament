@@ -20,4 +20,6 @@ return [
 
     // General
     'dashboard_view' => 'Access Main Dashboard',
+
+    'settings_view' => 'Administration',
 ];

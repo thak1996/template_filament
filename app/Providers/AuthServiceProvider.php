@@ -8,6 +8,9 @@ use Spatie\Permission\Models\Role;
 use App\Policies\RolePolicy;
 use App\Models\User;
 use App\Policies\UserPolicy;
+use Spatie\TranslationLoader\LanguageLine;
+use App\Policies\LanguageLinePolicy;
+use Illuminate\Support\Facades\Lang;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -19,6 +22,7 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         Role::class => RolePolicy::class,
         User::class => UserPolicy::class,
+        LanguageLine::class => LanguageLinePolicy::class,
     ];
 
     /**

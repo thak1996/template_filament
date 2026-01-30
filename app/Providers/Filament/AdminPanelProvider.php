@@ -33,6 +33,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->profile()
+            ->passwordReset()
             ->sidebarCollapsibleOnDesktop()
             ->brandName('FDS Sistema')
             ->colors([

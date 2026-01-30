@@ -21,7 +21,7 @@ enum PermissionEnum: string
     case TRANSLATIONS_CREATE = 'translations_create';
     case TRANSLATIONS_EDIT   = 'translations_edit';
 
-        // --- DASHBOARD / GERAL ---
+    // --- DASHBOARD / GERAL ---
     case DASHBOARD_VIEW = 'dashboard_view';
 
     public function getLabel(): ?string

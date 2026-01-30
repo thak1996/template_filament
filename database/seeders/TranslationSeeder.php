@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
 use Spatie\TranslationLoader\LanguageLine;
+use Illuminate\Support\Arr;
 
 class TranslationSeeder extends Seeder
 {
@@ -27,8 +28,12 @@ class TranslationSeeder extends Seeder
                 $translations = include $file->getPathname();
 
                 if (is_array($translations)) {
-                    foreach ($translations as $key => $text) {
-                        $data[$group][$key][$locale] = $text;
+                    $flattened = Arr::dot($translations);
+
+                    foreach ($flattened as $key => $text) {
+                        if (is_string($text)) {
+                            $data[$group][$key][$locale] = $text;
+                        }
                     }
                 }
             }

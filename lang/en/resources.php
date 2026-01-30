@@ -5,6 +5,12 @@ return [
         'label'        => 'User',
         'plural_label' => 'Users',
         'navigation'   => 'Manage Users',
+        'form_email_label' => 'Email',
+        'table_name_label' => 'Name',
+        'table_roles_label' => 'Roles',
+        'table_email_label' => 'Email',
+        'records_deleted' => 'Users deleted successfully',
+        'form_roles_label' => 'Roles',
     ],
     'roles' => [
         'label'        => 'Role',

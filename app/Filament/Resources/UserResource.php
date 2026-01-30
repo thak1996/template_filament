@@ -52,14 +52,14 @@ class UserResource extends Resource
         return $form
             ->schema([
                 TextInput::make('email')
-                    ->label(__('user_resource.form_email_label'))
+                    ->label(__('resources.users.form_email_label'))
                     ->email()
                     ->required()
                     ->unique(ignoreRecord: true)
                     ->maxLength(255),
 
                 Select::make('roles')
-                    ->label(__('user_resource.form_roles_label'))
+                    ->label(__('resources.users.form_roles_label'))
                     ->relationship('roles', 'name', modifyQueryUsing: function (Builder $query) {
                         if (! Auth::user()->hasRole(PanelRole::SUPER_ADMIN->value)) {
                             return $query->where('name', '!=', PanelRole::SUPER_ADMIN->value);
@@ -91,11 +91,11 @@ class UserResource extends Resource
             })
             ->columns([
                 TextColumn::make('name')
-                    ->label(__('user_resource.table_name_label'))
+                    ->label(__('resources.users.table_name_label'))
                     ->searchable(),
 
                 TextColumn::make('roles.name')
-                    ->label(__('user_resource.table_roles_label'))
+                    ->label(__('resources.users.table_roles_label'))
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         PanelRole::SUPER_ADMIN->value => 'danger',
@@ -108,7 +108,7 @@ class UserResource extends Resource
 
 
                 TextColumn::make('email')
-                    ->label(__('user_resource.table_email_label'))
+                    ->label(__('resources.users.table_email_label'))
                     ->searchable(),
             ])
             ->filters([
@@ -134,7 +134,7 @@ class UserResource extends Resource
                             $records = $records->reject(fn($user) => $user->id === Auth::id());
                             $records->each->delete();
                             \Filament\Notifications\Notification::make()
-                                ->title(__('user_resource.records_deleted'))
+                                ->title(__('resources.users.records_deleted'))
                                 ->success()
                                 ->send();
                         }),

@@ -6,6 +6,7 @@ use App\Filament\Resources\RoleResource\Pages;
 use App\Enums\PanelRole;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use App\Enums\PermissionEnum;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -72,36 +73,44 @@ class RoleResource extends Resource
                         Group::make()
                             ->schema(function () {
                                 $permissions = Permission::all();
-
                                 $groups = $permissions->groupBy(fn($perm) => Str::before($perm->name, '_'));
+                                return $groups->map(function ($permissionsDoGrupo, $nomeDoGrupo) {
+                                    $tituloGrupo = __("resources.{$nomeDoGrupo}.plural_label");
+                                    if ($tituloGrupo === "resources.{$nomeDoGrupo}.plural_label") {
+                                        $tituloGrupo = Str::ucfirst($nomeDoGrupo);
+                                    }
 
-                                return $groups->map(fn($permissionsDoGrupo, $nomeDoGrupo) => Section::make(Str::ucfirst($nomeDoGrupo))
-                                    ->schema([
-                                        CheckboxList::make('permissions_' . $nomeDoGrupo)
-                                            ->label('')
-                                            ->options($permissionsDoGrupo->pluck('name', 'id'))
-                                            ->bulkToggleable()
-                                            ->columns(2)
-                                            ->gridDirection('row')
-                                            ->disabled(
-                                                fn($record) =>
-                                                $record && $record->name === PanelRole::SUPER_ADMIN->value
-                                            )
-                                            ->formatStateUsing(function ($record) use ($permissionsDoGrupo) {
-                                                if (!$record) return [];
-                                                if ($record->name === PanelRole::SUPER_ADMIN->value) {
-                                                    return $permissionsDoGrupo->pluck('id')->toArray();
-                                                }
-                                                return $record->permissions
-                                                    ->whereIn('id', $permissionsDoGrupo->pluck('id'))
-                                                    ->pluck('id')
-                                                    ->toArray();
-                                            })
-                                            ->dehydrated(false),
-                                    ])
-                                    ->collapsible()
-                                    ->collapsed()
-                                    ->compact())->toArray();
+                                    return Section::make($tituloGrupo)
+                                        ->schema([
+                                            CheckboxList::make('permissions_' . $nomeDoGrupo)
+                                                ->label('')
+                                                ->options(
+                                                    $permissionsDoGrupo->mapWithKeys(function ($perm) {
+                                                        $enum = PermissionEnum::tryFrom($perm->name);
+                                                        $label = $enum ? $enum->getLabel() : $perm->name;
+                                                        return [$perm->id => $label];
+                                                    })
+                                                )
+                                                ->bulkToggleable()
+                                                ->columns(2)
+                                                ->gridDirection('row')
+                                                ->disabled(fn($record) => $record && $record->name === PanelRole::SUPER_ADMIN->value)
+                                                ->formatStateUsing(function ($record) use ($permissionsDoGrupo) {
+                                                    if (!$record) return [];
+                                                    if ($record->name === PanelRole::SUPER_ADMIN->value) {
+                                                        return $permissionsDoGrupo->pluck('id')->toArray();
+                                                    }
+                                                    return $record->permissions
+                                                        ->whereIn('id', $permissionsDoGrupo->pluck('id'))
+                                                        ->pluck('id')
+                                                        ->toArray();
+                                                })
+                                                ->dehydrated(false),
+                                        ])
+                                        ->collapsible()
+                                        ->collapsed()
+                                        ->compact();
+                                })->toArray();
                             })
                             ->columnSpanFull(),
                     ]),

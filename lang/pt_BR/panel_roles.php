@@ -3,7 +3,7 @@
 return [
     'super_admin' => 'Super Administrador',
     'admin' => 'Administrador',
-    'user' => 'Usuário Padrão',
+    'user' => 'Usuário ',
     's_admin' => 'S.Admin',
     'admin_short' => 'Admin',
     'user_short' => 'Usuário',

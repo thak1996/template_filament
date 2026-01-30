@@ -19,7 +19,7 @@ return [
     'translations_edit'   => 'Editar Traduções',
 
     // Geral
-    'dashboard_view' => 'Acessar Painel Principal (Dashboard)',
+    'dashboard_view' => 'Acessar Painel Principal',
 
     'settings_view' => 'Administração',
 ];

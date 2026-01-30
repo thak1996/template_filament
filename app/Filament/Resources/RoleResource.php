@@ -138,7 +138,10 @@ class RoleResource extends Resource
                         PanelRole::ADMIN->value => 'warning',
                         PanelRole::USER->value => 'success',
                         default => 'gray',
-                    }),
+                    })
+                    ->formatStateUsing(
+                        fn($state) => PanelRole::tryFrom($state)?->getLabel() ?? $state
+                    ),
 
                 TextColumn::make('permissions_count')
                     ->counts('permissions')

@@ -2,31 +2,42 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ProcessLeadWebhookJob;
 use App\Mail\NewLeadNotification;
 use App\Models\Lead;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 
 class LeadController extends Controller
 {
-    public function store(Request $request)
+    public function webhook(Request $request)
     {
-        $data = $request->validate([
-            'nome' => 'required|string|max:255',
-            'email' => 'required|email',
+        $validator = Validator::make($request->all(), [
+            'nome'     => 'required|string|max:255',
+            'email'    => 'required|email',
             'telefone' => 'nullable|string|max:20',
             'mensagem' => 'nullable',
         ], [
-            'nome.required' => 'Informe o nome.',
-            'email.required' => 'Informe o e-mail.',
-            'email.email' => 'Informe um e-mail válido.',
-            'telefone.max' => 'O telefone pode ter no máximo 20 caracteres.',
+            'nome.required'  => 'Provide the name.',
+            'email.required' => 'Provide the email.',
+            'email.email'    => 'Provide a valid email.',
         ]);
 
-        $lead = Lead::create($data);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
 
-        Mail::to(config('site.from_email'))->send(new NewLeadNotification($lead));
+        $lead = Lead::create($validator->validated());
 
-        return back()->with('success');
+        ProcessLeadWebhookJob::dispatch($lead);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Lead recebido e sendo processado.',
+            'id'      => $lead->id
+        ], 200);
     }
 }

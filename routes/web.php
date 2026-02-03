@@ -1,9 +1,7 @@
 <?php
 
 use App\Http\Controllers\LanguageController;
-use App\Http\Controllers\LeadController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Session;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,9 +13,5 @@ use Illuminate\Support\Facades\Session;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
-Route::get('/', fn() => view('welcome'));
-
-Route::post('/leads', [LeadController::class, 'store'])->name('leads.store');
 
 Route::get('/lang/{locale}', [LanguageController::class, 'switch'])->name('switch-language');

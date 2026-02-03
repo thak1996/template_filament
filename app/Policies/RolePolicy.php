@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\Enums\PermissionEnum;
+use App\Enums\Permissions\RolesPermission;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 use App\Enums\PanelRole;
@@ -12,17 +12,17 @@ class RolePolicy
 
     public function viewAny(User $user): bool
     {
-        return $user->can(PermissionEnum::ROLES_VIEW->value);
+        return $user->can(RolesPermission::ROLES_VIEW->value);
     }
 
     public function view(User $user, Role $role): bool
     {
-        return $user->can(PermissionEnum::ROLES_VIEW->value);
+        return $user->can(RolesPermission::ROLES_VIEW->value);
     }
 
     public function create(User $user): bool
     {
-        return $user->can(PermissionEnum::ROLES_CREATE->value);
+        return $user->can(RolesPermission::ROLES_CREATE->value);
     }
 
     public function update(User $user, Role $role): bool
@@ -31,7 +31,7 @@ class RolePolicy
             return false;
         }
 
-        return $user->can(PermissionEnum::ROLES_EDIT->value);
+        return $user->can(RolesPermission::ROLES_EDIT->value);
     }
 
     public function delete(User $user, Role $role): bool
@@ -42,6 +42,6 @@ class RolePolicy
             return false;
         }
 
-        return $user->can(PermissionEnum::ROLES_DELETE->value);
+        return $user->can(RolesPermission::ROLES_DELETE->value);
     }
 }

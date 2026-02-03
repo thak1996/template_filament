@@ -15,13 +15,18 @@ class LeadController extends Controller
             'nome' => 'required|string|max:255',
             'email' => 'required|email',
             'telefone' => 'nullable|string|max:20',
-            'mensagem' => 'nullable'
+            'mensagem' => 'nullable',
+        ], [
+            'nome.required' => 'Informe o nome.',
+            'email.required' => 'Informe o e-mail.',
+            'email.email' => 'Informe um e-mail válido.',
+            'telefone.max' => 'O telefone pode ter no máximo 20 caracteres.',
         ]);
 
         $lead = Lead::create($data);
 
-        Mail::to('seu-email@franklyndev.com.br')->send(new NewLeadNotification($lead));
+        Mail::to(config('site.from_email'))->send(new NewLeadNotification($lead));
 
-        return back()->with('success', 'Lead capturado com sucesso!');
+        return back()->with('success');
     }
 }

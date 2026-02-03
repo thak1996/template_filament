@@ -11,4 +11,5 @@ return [
         'state' => 'UF',
         'zip' => '00000-000',
     ],
+    'from_email' => env('MAIL_FROM_ADDRESS', 'contato@empresa.com.br'),
 ];

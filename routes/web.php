@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\LeadController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 
@@ -14,17 +16,8 @@ use Illuminate\Support\Facades\Session;
 |
 */
 
-Route::get('/', fn() => view('home'));
+Route::get('/', fn() => view('welcome'));
 
+Route::post('/leads', [LeadController::class, 'store'])->name('leads.store');
 
-
-
-Route::get('/lang/{locale}', function ($locale) {
-    if (! in_array($locale, ['en', 'pt_BR'])) {
-        abort(400);
-    }
-
-    Session::put('locale', $locale);
-
-    return back();
-})->name('switch-language');
+Route::get('/lang/{locale}', [LanguageController::class, 'switch'])->name('switch-language');

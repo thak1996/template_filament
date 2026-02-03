@@ -5,15 +5,31 @@ namespace Database\Seeders;
 use App\Enums\PermissionEnum;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
+use Illuminate\Support\Facades\File;
 
 class PermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        foreach (PermissionEnum::cases() as $permission) {
-            Permission::firstOrCreate(['name' => $permission->value]);
+        $path = app_path('Enums/Permissions');
+
+        if (!File::isDirectory($path)) {
+            return;
+        }
+
+        $files = File::allFiles($path);
+
+        foreach ($files as $file) {
+            $class = 'App\\Enums\\Permissions\\' . $file->getBasename('.php');
+
+            if (class_exists($class) && method_exists($class, 'cases')) {
+                foreach ($class::cases() as $case) {
+                    Permission::findOrCreate($case->value, 'web');
+                }
+            }
         }
     }
 }

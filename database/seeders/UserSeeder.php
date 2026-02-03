@@ -12,7 +12,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $superAdminUser = User::firstOrCreate(
-            ['email' => 'superadmin@admin.com'],
+            ['email' => 'admin@admin.com'],
             [
                 'name' => 'Super Admin',
                 'password' => Hash::make('password'),
@@ -22,32 +22,6 @@ class UserSeeder extends Seeder
 
         if (!$superAdminUser->hasRole(PanelRole::SUPER_ADMIN->value)) {
             $superAdminUser->assignRole(PanelRole::SUPER_ADMIN->value);
-        }
-
-        $adminUser = User::firstOrCreate(
-            ['email' => 'admin@admin.com'],
-            [
-                'name' => 'Admin',
-                'password' => Hash::make('password'),
-                'email_verified_at' => now(),
-            ]
-        );
-
-        if (!$adminUser->hasRole(PanelRole::ADMIN->value)) {
-            $adminUser->assignRole(PanelRole::ADMIN->value);
-        }
-
-        $user = User::firstOrCreate(
-            ['email' => 'user@admin.com'],
-            [
-                'name' => 'User',
-                'password' => Hash::make('password'),
-                'email_verified_at' => now(),
-            ]
-        );
-
-        if (!$user->hasRole(PanelRole::USER->value)) {
-            $user->assignRole(PanelRole::USER->value);
         }
     }
 }

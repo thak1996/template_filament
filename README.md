@@ -60,7 +60,7 @@ Edite o arquivo `.env` com as seguintes configurações **obrigatórias**:
 
 ```properties
 # === CONFIGURAÇÕES DA APLICAÇÃO ===
-APP_NAME="FDS Logística"
+APP_NAME="Template Laravel"
 APP_ENV=local
 APP_KEY=
 APP_DEBUG=true

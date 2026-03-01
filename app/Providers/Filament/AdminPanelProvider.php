@@ -36,6 +36,7 @@ class AdminPanelProvider extends PanelProvider
             ->passwordReset()
             ->sidebarCollapsibleOnDesktop()
             ->brandName(config('app.name'))
+            // ->tenant(Company::class, slugAttribute: 'subdomain')
             ->colors([
                 'primary' => Color::Sky,
             ])

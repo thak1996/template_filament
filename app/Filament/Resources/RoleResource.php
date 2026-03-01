@@ -4,9 +4,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\RoleResource\Pages;
 use App\Enums\PanelRole;
+use App\Helpers\PermissionHelper;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-use App\Enums\PermissionEnum;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -82,12 +82,11 @@ class RoleResource extends Resource
 
                                     return Section::make($tituloGrupo)
                                         ->schema([
-                                            CheckboxList::make('permissions_' . $nomeDoGrupo)
+                                            CheckboxList::make("permissions_$nomeDoGrupo")
                                                 ->label('')
                                                 ->options(
                                                     $permissionsDoGrupo->mapWithKeys(function ($perm) {
-                                                        $enum = PermissionEnum::tryFrom($perm->name);
-                                                        $label = $enum ? $enum->getLabel() : $perm->name;
+                                                        $label = PermissionHelper::getLabel($perm->name);
                                                         return [$perm->id => $label];
                                                     })
                                                 )

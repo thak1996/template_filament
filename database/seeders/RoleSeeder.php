@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Enums\PanelRole;
-use App\Enums\PermissionEnum;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 

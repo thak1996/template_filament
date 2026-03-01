@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Enums\PanelIdEnum;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -21,7 +22,7 @@ class ResetPasswordNotification extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
-        $url = filament()->getPanel('admin')->getResetPasswordUrl($this->token, $notifiable);
+        $url = filament()->getPanel(PanelIdEnum::ADMIN->value)->getResetPasswordUrl($this->token, $notifiable);
 
         return (new MailMessage)
             ->subject('🔐 Redefinição de Senha - ' . config('app.name'))

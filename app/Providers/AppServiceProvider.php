@@ -23,11 +23,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        LanguageSwitch::configureUsing(function (LanguageSwitch $switch) {
-            return $switch
-                ->locales(['pt_BR', 'en'])
-                ->circular();
-        });
+        LanguageSwitch::configureUsing(fn(LanguageSwitch $switch) => $switch
+            ->locales(['pt_BR', 'en'])
+            ->circular());
         Gate::before(function ($user, $ability) {
             if ($user->hasRole(PanelRole::SUPER_ADMIN->value)) {
                 return true;

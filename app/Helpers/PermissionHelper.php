@@ -3,7 +3,6 @@
 namespace App\Helpers;
 
 use App\Enums\Permissions\DashboardPermission;
-use App\Enums\Permissions\LeadPermission;
 use App\Enums\Permissions\RolesPermission;
 use App\Enums\Permissions\TranslationsPermission;
 use App\Enums\Permissions\UserPermission;

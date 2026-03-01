@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\PanelIdEnum;
 use App\Filament\Resources\LanguageLineResource\Pages;
 use App\Filament\Resources\LanguageLineResource\RelationManagers;
+use Filament\Facades\Filament;
 use Spatie\TranslationLoader\LanguageLine;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -22,6 +24,16 @@ class LanguageLineResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-language';
     protected static ?int $navigationSort = 2;
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return Filament::getCurrentPanel()?->getId() === PanelIdEnum::ADMIN->value;
+    }
+
+    public static function canAccess(): bool
+    {
+        return Filament::getCurrentPanel()?->getId() === PanelIdEnum::ADMIN->value;
+    }
 
     public static function getModelLabel(): string
     {

@@ -10,6 +10,8 @@ class RoleSeeder extends Seeder
 {
     public function run(): void
     {
-        Role::firstOrCreate(['name' => PanelRole::SUPER_ADMIN->value]);
+        foreach (PanelRole::cases() as $role) {
+            Role::firstOrCreate(['name' => $role->value]);
+        }
     }
 }

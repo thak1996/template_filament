@@ -2,9 +2,12 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\PanelIdEnum;
 use App\Filament\Resources\RoleResource\Pages;
+use App\Models\User as AppUser;
 use App\Enums\PanelRole;
 use App\Helpers\PermissionHelper;
+use Filament\Facades\Filament;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Filament\Forms;
@@ -27,6 +30,16 @@ class RoleResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
     protected static ?int $navigationSort = 1;
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return Filament::getCurrentPanel()?->getId() === PanelIdEnum::ADMIN->value;
+    }
+
+    public static function canAccess(): bool
+    {
+        return Filament::getCurrentPanel()?->getId() === PanelIdEnum::ADMIN->value;
+    }
 
     public static function getModelLabel(): string
     {
@@ -120,7 +133,10 @@ class RoleResource extends Resource
     {
         return $table
             ->modifyQueryUsing(function (Builder $query) {
-                if (! Auth::user()->hasRole(PanelRole::SUPER_ADMIN->value)) {
+                /** @var AppUser|null $authUser */
+                $authUser = Auth::user();
+
+                if (! $authUser || ! method_exists($authUser, 'hasRole') || ! $authUser->hasRole(PanelRole::SUPER_ADMIN->value)) {
                     return $query->where('name', '!=', PanelRole::SUPER_ADMIN->value);
                 }
                 return $query;

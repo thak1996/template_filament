@@ -35,6 +35,10 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->profile()
             ->passwordReset()
+            ->renderHook(
+                PanelsRenderHook::BODY_END,
+                fn(): string => Blade::render("@include('filament.components.floating-language-switcher')"),
+            )
             ->sidebarCollapsibleOnDesktop()
             ->brandName(config('app.name'))
             ->colors([

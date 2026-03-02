@@ -2,10 +2,12 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\PanelIdEnum;
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use App\Enums\PanelRole;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -26,6 +28,16 @@ class UserResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
     protected static ?int $navigationSort = 0;
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return Filament::getCurrentPanel()?->getId() === PanelIdEnum::ADMIN->value;
+    }
+
+    public static function canAccess(): bool
+    {
+        return Filament::getCurrentPanel()?->getId() === PanelIdEnum::ADMIN->value;
+    }
 
     public static function getModelLabel(): string
     {
@@ -61,7 +73,10 @@ class UserResource extends Resource
                 Select::make('roles')
                     ->label(__('resources.users.form_roles_label'))
                     ->relationship('roles', 'name', modifyQueryUsing: function (Builder $query) {
-                        if (! Auth::user()->hasRole(PanelRole::SUPER_ADMIN->value)) {
+                        /** @var User|null $authUser */
+                        $authUser = Auth::user();
+
+                        if (! $authUser || ! method_exists($authUser, 'hasRole') || ! $authUser->hasRole(PanelRole::SUPER_ADMIN->value)) {
                             return $query->where('name', '!=', PanelRole::SUPER_ADMIN->value);
                         }
                         return $query;
@@ -80,9 +95,15 @@ class UserResource extends Resource
     {
         return $table
             ->modifyQueryUsing(function (Builder $query) {
+                /** @var User|null $user */
                 $user = Auth::user();
+
+                if (! $user) {
+                    return $query;
+                }
+
                 $superAdminRole = PanelRole::SUPER_ADMIN->value;
-                if (! $user->hasRole($superAdminRole)) {
+                if (! method_exists($user, 'hasRole') || ! $user->hasRole($superAdminRole)) {
                     return $query->whereDoesntHave('roles', function ($q) use ($superAdminRole) {
                         $q->where('name', $superAdminRole);
                     });

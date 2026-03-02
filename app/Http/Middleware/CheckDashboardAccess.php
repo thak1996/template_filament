@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\PanelIdEnum;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +16,7 @@ class CheckDashboardAccess
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->routeIs('filament.admin.auth.logout')) {
+        if ($request->routeIs('filament.' . PanelIdEnum::ADMIN->value . '.auth.logout')) {
             return $next($request);
         }
 

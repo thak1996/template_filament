@@ -3,13 +3,19 @@
 namespace App\Providers\Filament;
 
 use App\Enums\PanelIdEnum;
+use App\Filament\Pages\Auth\ClientRegister;
+use App\Filament\Pages\Tenancy\EditCompanyProfile;
+use App\Filament\Pages\Tenancy\RegisterCompany;
 use App\Http\Middleware\CheckDashboardAccess;
 use App\Http\Middleware\SetLocale;
+use App\Models\Company;
+use App\Models\User;
+use Filament\Facades\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\MenuItem;
+use Filament\Navigation\NavigationItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -24,16 +30,16 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
-class AdminPanelProvider extends PanelProvider
+class ClientPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->default()
-            ->id(PanelIdEnum::ADMIN->value)
-            ->path(PanelIdEnum::ADMIN->getPath())
+            ->id(PanelIdEnum::CLIENT->value)
+            ->path(PanelIdEnum::CLIENT->getPath())
             ->login()
             ->profile()
+            ->registration(ClientRegister::class)
             ->passwordReset()
             ->renderHook(
                 PanelsRenderHook::BODY_END,
@@ -41,6 +47,32 @@ class AdminPanelProvider extends PanelProvider
             )
             ->sidebarCollapsibleOnDesktop()
             ->brandName(config('app.name'))
+            ->tenant(Company::class, slugAttribute: 'slug')
+            ->tenantRegistration(RegisterCompany::class)
+            ->tenantProfile(EditCompanyProfile::class)
+            ->tenantMenu(function (): bool {
+                $user = auth()->user();
+
+                if (! $user instanceof User) {
+                    return false;
+                }
+
+                return count($user->getTenants(Filament::getCurrentPanel())) > 1;
+            })
+            ->navigationItems([
+                NavigationItem::make('company-settings')
+                    ->label(__('onboarding.navigation.company_settings'))
+                    ->icon('heroicon-o-building-office')
+                    ->group(__('onboarding.navigation.settings_group'))
+                    ->sort(90)
+                    ->url(function (): ?string {
+                        if (Filament::getTenant()) {
+                            return Filament::getTenantProfileUrl();
+                        }
+
+                        return Filament::getTenantRegistrationUrl();
+                    }),
+            ])
             ->colors([
                 'primary' => Color::Sky,
             ])
@@ -64,7 +96,7 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-                SetLocale::class
+                SetLocale::class,
             ])
             ->authMiddleware([
                 Authenticate::class,

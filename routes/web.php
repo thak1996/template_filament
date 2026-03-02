@@ -1,7 +1,9 @@
 <?php
 
+use App\Jobs\QueueHealthCheckJob;
 use App\Http\Controllers\LanguageController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,3 +17,17 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/lang/{locale}', [LanguageController::class, 'switch'])->name('switch-language');
+
+if (app()->environment('local')) {
+    Route::get('/dev/queue-test', function () {
+        $reference = (string) Str::uuid();
+
+        QueueHealthCheckJob::dispatch('web', $reference);
+
+        return response()->json([
+            'status' => 'queued',
+            'reference' => $reference,
+            'message' => 'Job de teste enviado para a fila. Verifique os logs do worker.',
+        ]);
+    })->name('dev.queue.test');
+}

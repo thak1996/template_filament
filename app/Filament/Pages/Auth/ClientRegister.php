@@ -4,6 +4,8 @@ namespace App\Filament\Pages\Auth;
 
 use App\Enums\PanelRole;
 use App\Models\Company;
+use App\Rules\ValidCnpj;
+use App\Rules\ValidCpf;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -21,6 +23,19 @@ class ClientRegister extends Register
                 $this->getNameFormComponent(),
                 $this->getEmailFormComponent(),
 
+                TextInput::make('cpf')
+                    ->label('CPF')
+                    ->required()
+                    ->mask('999.999.999-99')
+                    ->maxLength(14)
+                    ->rule(new ValidCpf())
+                    ->unique($this->getUserModel(), 'cpf')
+                    ->validationMessages([
+                        'required' => 'Informe o CPF para continuar.',
+                        'unique' => 'Este CPF já está cadastrado.',
+                    ])
+                    ->dehydrateStateUsing(fn(?string $state): ?string => $this->normalizeCpf((string) $state)),
+
                 Radio::make('is_accountant')
                     ->label('É contador?')
                     ->boolean()
@@ -36,16 +51,32 @@ class ClientRegister extends Register
                     ->required(),
 
                 TextInput::make('representation_document')
-                    ->label('Documento de representação')
-                    ->maxLength(30)
+                    ->label('CRC')
+                    ->mask('CRC-aa 999999/a-9')
+                    ->maxLength(17)
+                    ->live()
+                    ->rule('regex:/^CRC-[A-Z]{2}\s\d{6}\/[A-Z]-\d$/')
+                    ->validationMessages([
+                        'regex' => 'Formato inválido. Use o padrão: CRC-UF NNNNNN/Tipo-DV (ex.: CRC-SP 123456/O-1).',
+                    ])
                     ->visible(fn(callable $get): bool => $get('is_accountant') === true)
-                    ->required(fn(callable $get): bool => $get('is_accountant') === true),
+                    ->required(fn(callable $get): bool => $get('is_accountant') === true)
+                    ->afterStateUpdated(function (callable $set, ?string $state): void {
+                        $set('representation_document', filled($state) ? Str::upper(trim($state)) : null);
+                    })
+                    ->dehydrateStateUsing(fn(?string $state): ?string => filled($state) ? Str::upper(trim($state)) : null),
 
                 TextInput::make('accounting_cnpj')
                     ->label('CNPJ da contabilidade')
+                    ->mask('99.999.999/9999-99')
                     ->maxLength(18)
+                    ->rule(new ValidCnpj())
+                    ->validationMessages([
+                        'required' => 'Informe o CNPJ da contabilidade.',
+                    ])
                     ->visible(fn(callable $get): bool => $get('is_accountant') === true)
-                    ->required(fn(callable $get): bool => $get('is_accountant') === true),
+                    ->required(fn(callable $get): bool => $get('is_accountant') === true)
+                    ->dehydrateStateUsing(fn(?string $state): ?string => $this->normalizeCnpj((string) $state)),
 
                 Radio::make('has_cnpj')
                     ->label('Possui CNPJ?')
@@ -61,9 +92,15 @@ class ClientRegister extends Register
 
                 TextInput::make('company_cnpj')
                     ->label('CNPJ da empresa')
+                    ->mask('99.999.999/9999-99')
                     ->maxLength(18)
+                    ->rule(new ValidCnpj())
+                    ->validationMessages([
+                        'required' => 'Informe o CNPJ da empresa.',
+                    ])
                     ->visible(fn(callable $get): bool => $get('is_accountant') === false && $get('has_cnpj') === true)
-                    ->required(fn(callable $get): bool => $get('is_accountant') === false && $get('has_cnpj') === true),
+                    ->required(fn(callable $get): bool => $get('is_accountant') === false && $get('has_cnpj') === true)
+                    ->dehydrateStateUsing(fn(?string $state): ?string => $this->normalizeCnpj((string) $state)),
 
                 TextInput::make('company_identifier')
                     ->label('Identificador da empresa (CÓDIGO)')
@@ -92,6 +129,7 @@ class ClientRegister extends Register
         $user = $this->getUserModel()::create([
             'name' => $data['name'],
             'email' => $data['email'],
+            'cpf' => $this->normalizeCpf((string) ($data['cpf'] ?? '')),
             'password' => $data['password'],
             'is_accountant' => (bool) ($data['is_accountant'] ?? false),
             'has_cnpj' => isset($data['has_cnpj']) ? (bool) $data['has_cnpj'] : null,
@@ -195,5 +233,12 @@ class ClientRegister extends Register
         $digits = preg_replace('/\D+/', '', $value) ?? '';
 
         return strlen($digits) === 14 ? $digits : null;
+    }
+
+    protected function normalizeCpf(string $value): ?string
+    {
+        $digits = preg_replace('/\D+/', '', $value) ?? '';
+
+        return strlen($digits) === 11 ? $digits : null;
     }
 }

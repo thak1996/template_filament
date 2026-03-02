@@ -6,6 +6,7 @@ use App\Enums\PanelIdEnum;
 use App\Filament\Resources\CompanyResource\Pages;
 use App\Filament\Resources\CompanyResource\RelationManagers;
 use App\Models\Company;
+use App\Rules\ValidCnpj;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
@@ -43,8 +44,15 @@ class CompanyResource extends Resource
                     ->unique(ignoreRecord: true),
                 TextInput::make('cnpj')
                     ->required()
+                    ->mask('99.999.999/9999-99')
                     ->maxLength(18)
-                    ->unique(ignoreRecord: true),
+                    ->rule(new ValidCnpj())
+                    ->unique(ignoreRecord: true)
+                    ->dehydrateStateUsing(function (?string $state): ?string {
+                        $digits = preg_replace('/\D+/', '', (string) $state) ?? '';
+
+                        return strlen($digits) === 14 ? $digits : null;
+                    }),
                 TextInput::make('slug')
                     ->required()
                     ->unique(ignoreRecord: true),

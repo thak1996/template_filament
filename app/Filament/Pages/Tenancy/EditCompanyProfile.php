@@ -4,6 +4,7 @@ namespace App\Filament\Pages\Tenancy;
 
 use App\Enums\PanelIdEnum;
 use App\Models\User;
+use App\Rules\ValidCnpj;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
@@ -44,8 +45,15 @@ class EditCompanyProfile extends EditTenantProfile
                         TextInput::make('cnpj')
                             ->label('CNPJ')
                             ->required()
+                            ->mask('99.999.999/9999-99')
                             ->maxLength(18)
-                            ->unique(ignoreRecord: true),
+                            ->rule(new ValidCnpj())
+                            ->unique(ignoreRecord: true)
+                            ->dehydrateStateUsing(function (?string $state): ?string {
+                                $digits = preg_replace('/\D+/', '', (string) $state) ?? '';
+
+                                return strlen($digits) === 14 ? $digits : null;
+                            }),
                     ]),
 
                 Section::make('Acesso e identificação')

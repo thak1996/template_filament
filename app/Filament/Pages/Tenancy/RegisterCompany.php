@@ -4,6 +4,7 @@ namespace App\Filament\Pages\Tenancy;
 
 use App\Models\Company;
 use App\Models\User;
+use App\Rules\ValidCnpj;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Pages\Tenancy\RegisterTenant;
@@ -33,8 +34,15 @@ class RegisterCompany extends RegisterTenant
                 TextInput::make('cnpj')
                     ->label('CNPJ')
                     ->required()
+                    ->mask('99.999.999/9999-99')
                     ->maxLength(18)
-                    ->unique(ignoreRecord: true),
+                    ->rule(new ValidCnpj())
+                    ->unique(ignoreRecord: true)
+                    ->dehydrateStateUsing(function (?string $state): ?string {
+                        $digits = preg_replace('/\D+/', '', (string) $state) ?? '';
+
+                        return strlen($digits) === 14 ? $digits : null;
+                    }),
             ]);
     }
 

@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
+            $table->string('cpf', 14)->nullable()->unique()->after('email');
             $table->boolean('is_accountant')->default(false)->after('language');
             $table->boolean('has_cnpj')->nullable()->after('is_accountant');
             $table->string('representation_document')->nullable()->after('has_cnpj');
@@ -26,6 +27,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn([
+                'cpf',
                 'is_accountant',
                 'has_cnpj',
                 'representation_document',

@@ -197,6 +197,33 @@ php artisan migrate
 php artisan route:list
 ```
 
+### Filas (Queue) com Docker
+
+```bash
+# Subir o worker de filas junto com os demais serviços
+docker-compose up -d laravel.worker
+
+# Ver logs do worker
+docker-compose logs -f laravel.worker
+
+# Reiniciar worker após deploy/config changes
+docker-compose restart laravel.worker
+```
+
+> Pré-requisitos: `QUEUE_CONNECTION=database` no `.env` e migrações executadas (`jobs` e `failed_jobs`).
+
+#### Teste rápido da fila
+
+```bash
+# Disparar job de teste via CLI
+./vendor/bin/sail artisan queue:health-check
+
+# Acompanhar processamento no worker
+docker compose logs -f laravel.worker
+```
+
+Em ambiente local, também é possível disparar via navegador: `GET /dev/queue-test`.
+
 ## 📁 Estrutura do Projeto
 
 ```
@@ -223,34 +250,40 @@ site-fds/
 ## 🧪 Testando Funcionalidades
 
 ### 1. Formulário de Contato
+
 - Acesse: [http://localhost:8080/contato](http://localhost:8080/contato)
 - Preencha e envie o formulário
 - Verifique o e-mail em: [http://localhost:8025](http://localhost:8025)
 
 ### 2. Solicitação de Orçamento
+
 - Acesse: [http://localhost:8080/orcamento](http://localhost:8080/orcamento)
 - Teste a busca automática de CEP
 - Envie uma solicitação de orçamento
 
 ### 3. Busca de CEP
+
 - Digite qualquer CEP válido (ex: 01310-100)
 - O endereço deve ser preenchido automaticamente
 
 ## 🔧 Solução de Problemas
 
 ### Erro: "Permission denied"
+
 ```bash
 sudo chown -R $USER:$USER .
 chmod -R 755 storage bootstrap/cache
 ```
 
 ### Erro: "Port already in use"
+
 ```bash
 # Altere APP_PORT no .env para outra porta (ex: 8081)
 APP_PORT=8081
 ```
 
 ### Assets não carregam
+
 ```bash
 # Recompile os assets
 npm run build
@@ -260,6 +293,7 @@ docker-compose exec app php artisan view:clear
 ```
 
 ### E-mails não chegam
+
 - Verifique se o Mailpit está rodando: [http://localhost:8025](http://localhost:8025)
 - Confirme as configurações de e-mail no `.env`
 

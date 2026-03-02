@@ -61,10 +61,8 @@ class EditCompanyProfile extends EditTenantProfile
                             ->afterStateHydrated(function (TextInput $component, ?Model $record): void {
                                 if (! $record) {
                                     $component->state((string) config('app.url'));
-
                                     return;
                                 }
-
                                 $component->state(
                                     Filament::getPanel(PanelIdEnum::CLIENT->value)->getUrl($record)
                                 );

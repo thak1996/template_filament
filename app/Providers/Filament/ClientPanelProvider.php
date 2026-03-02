@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Enums\PanelIdEnum;
+use App\Filament\Pages\Auth\ClientRegister;
 use App\Filament\Pages\Tenancy\EditCompanyProfile;
 use App\Filament\Pages\Tenancy\RegisterCompany;
 use App\Http\Middleware\CheckDashboardAccess;
@@ -36,7 +37,7 @@ class ClientPanelProvider extends PanelProvider
             ->path(PanelIdEnum::CLIENT->getPath())
             ->login()
             ->profile()
-            ->registration()
+            ->registration(ClientRegister::class)
             ->passwordReset()
             ->sidebarCollapsibleOnDesktop()
             ->brandName(config('app.name'))

@@ -32,6 +32,10 @@ class User extends Authenticatable implements FilamentUser, HasTenants
         'email',
         'password',
         'language',
+        'is_accountant',
+        'has_cnpj',
+        'representation_document',
+        'accounting_cnpj',
         'company_id',
     ];
 
@@ -54,6 +58,8 @@ class User extends Authenticatable implements FilamentUser, HasTenants
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'language' => LanguageEnum::class,
+        'is_accountant' => 'boolean',
+        'has_cnpj' => 'boolean',
     ];
 
     public function canAccessPanel(Panel $panel): bool

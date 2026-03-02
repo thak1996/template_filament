@@ -16,7 +16,7 @@ class EditCompanyProfile extends EditTenantProfile
 {
     public static function getLabel(): string
     {
-        return __('Dados da empresa');
+        return __('onboarding.company.profile_label');
     }
 
     public static function canView(Model $tenant): bool
@@ -34,16 +34,16 @@ class EditCompanyProfile extends EditTenantProfile
     {
         return $form
             ->schema([
-                Section::make('Dados da empresa')
-                    ->description('Informações que você pode atualizar.')
+                Section::make(__('onboarding.company.editable_section_title'))
+                    ->description(__('onboarding.company.editable_section_description'))
                     ->columns(2)
                     ->schema([
                         TextInput::make('name')
-                            ->label('Nome da empresa')
+                            ->label(__('onboarding.company.name'))
                             ->required()
                             ->maxLength(255),
                         TextInput::make('cnpj')
-                            ->label('CNPJ')
+                            ->label(__('onboarding.company.cnpj'))
                             ->required()
                             ->mask('99.999.999/9999-99')
                             ->maxLength(18)
@@ -56,16 +56,16 @@ class EditCompanyProfile extends EditTenantProfile
                             }),
                     ]),
 
-                Section::make('Acesso e identificação')
-                    ->description('Dados somente leitura para compartilhar o acesso da empresa.')
+                Section::make(__('onboarding.company.readonly_section_title'))
+                    ->description(__('onboarding.company.readonly_section_description'))
                     ->icon('heroicon-o-lock-closed')
                     ->columns(2)
                     ->schema([
                         TextInput::make('company_url')
-                            ->label('Link da empresa')
+                            ->label(__('onboarding.company.company_url'))
                             ->readOnly()
                             ->dehydrated(false)
-                            ->helperText('Esse link é gerado automaticamente e não pode ser alterado por aqui.')
+                            ->helperText(__('onboarding.company.company_url_helper'))
                             ->afterStateHydrated(function (TextInput $component, ?Model $record): void {
                                 if (! $record) {
                                     $component->state((string) config('app.url'));
@@ -76,7 +76,7 @@ class EditCompanyProfile extends EditTenantProfile
                                 );
                             }),
                         TextInput::make('slug_preview')
-                            ->label('Slug')
+                            ->label(__('onboarding.company.slug'))
                             ->readOnly()
                             ->dehydrated(false)
                             ->afterStateHydrated(function (TextInput $component, ?Model $record): void {

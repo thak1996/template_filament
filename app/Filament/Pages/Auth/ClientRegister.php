@@ -24,20 +24,20 @@ class ClientRegister extends Register
                 $this->getEmailFormComponent(),
 
                 TextInput::make('cpf')
-                    ->label('CPF')
+                    ->label(__('onboarding.client_register.cpf'))
                     ->required()
                     ->mask('999.999.999-99')
                     ->maxLength(14)
                     ->rule(new ValidCpf())
                     ->unique($this->getUserModel(), 'cpf')
                     ->validationMessages([
-                        'required' => 'Informe o CPF para continuar.',
-                        'unique' => 'Este CPF já está cadastrado.',
+                        'required' => __('onboarding.client_register.messages.cpf_required'),
+                        'unique' => __('onboarding.client_register.messages.cpf_unique'),
                     ])
                     ->dehydrateStateUsing(fn(?string $state): ?string => $this->normalizeCpf((string) $state)),
 
                 Radio::make('is_accountant')
-                    ->label('É contador?')
+                    ->label(__('onboarding.client_register.is_accountant'))
                     ->boolean()
                     ->inline()
                     ->live()
@@ -51,35 +51,35 @@ class ClientRegister extends Register
                     ->required(),
 
                 TextInput::make('representation_document')
-                    ->label('CRC')
+                    ->label(__('onboarding.client_register.crc'))
                     ->mask('CRC-aa 999999/a-9')
                     ->maxLength(17)
                     ->live()
                     ->rule('regex:/^CRC-[A-Z]{2}\s\d{6}\/[A-Z]-\d$/')
                     ->validationMessages([
-                        'regex' => 'Formato inválido. Use o padrão: CRC-UF NNNNNN/Tipo-DV (ex.: CRC-SP 123456/O-1).',
+                        'regex' => __('onboarding.client_register.messages.crc_regex'),
                     ])
-                    ->visible(fn(callable $get): bool => $get('is_accountant') === true)
-                    ->required(fn(callable $get): bool => $get('is_accountant') === true)
+                    ->visible(fn(callable $get): bool => $this->asBoolean($get('is_accountant')) === true)
+                    ->required(fn(callable $get): bool => $this->asBoolean($get('is_accountant')) === true)
                     ->afterStateUpdated(function (callable $set, ?string $state): void {
                         $set('representation_document', filled($state) ? Str::upper(trim($state)) : null);
                     })
                     ->dehydrateStateUsing(fn(?string $state): ?string => filled($state) ? Str::upper(trim($state)) : null),
 
                 TextInput::make('accounting_cnpj')
-                    ->label('CNPJ da contabilidade')
+                    ->label(__('onboarding.client_register.accounting_cnpj'))
                     ->mask('99.999.999/9999-99')
                     ->maxLength(18)
                     ->rule(new ValidCnpj())
                     ->validationMessages([
-                        'required' => 'Informe o CNPJ da contabilidade.',
+                        'required' => __('onboarding.client_register.messages.accounting_cnpj_required'),
                     ])
-                    ->visible(fn(callable $get): bool => $get('is_accountant') === true)
-                    ->required(fn(callable $get): bool => $get('is_accountant') === true)
+                    ->visible(fn(callable $get): bool => $this->asBoolean($get('is_accountant')) === true)
+                    ->required(fn(callable $get): bool => $this->asBoolean($get('is_accountant')) === true)
                     ->dehydrateStateUsing(fn(?string $state): ?string => $this->normalizeCnpj((string) $state)),
 
                 Radio::make('has_cnpj')
-                    ->label('Possui CNPJ?')
+                    ->label(__('onboarding.client_register.has_cnpj'))
                     ->boolean()
                     ->inline()
                     ->live()
@@ -87,27 +87,27 @@ class ClientRegister extends Register
                         $set('company_cnpj', null);
                         $set('company_identifier', null);
                     })
-                    ->visible(fn(callable $get): bool => $get('is_accountant') === false)
-                    ->required(fn(callable $get): bool => $get('is_accountant') === false),
+                    ->visible(fn(callable $get): bool => $this->asBoolean($get('is_accountant')) === false)
+                    ->required(fn(callable $get): bool => $this->asBoolean($get('is_accountant')) === false),
 
                 TextInput::make('company_cnpj')
-                    ->label('CNPJ da empresa')
+                    ->label(__('onboarding.client_register.company_cnpj'))
                     ->mask('99.999.999/9999-99')
                     ->maxLength(18)
                     ->rule(new ValidCnpj())
                     ->validationMessages([
-                        'required' => 'Informe o CNPJ da empresa.',
+                        'required' => __('onboarding.client_register.messages.company_cnpj_required'),
                     ])
-                    ->visible(fn(callable $get): bool => $get('is_accountant') === false && $get('has_cnpj') === true)
-                    ->required(fn(callable $get): bool => $get('is_accountant') === false && $get('has_cnpj') === true)
+                    ->visible(fn(callable $get): bool => $this->asBoolean($get('is_accountant')) === false && $this->asBoolean($get('has_cnpj')) === true)
+                    ->required(fn(callable $get): bool => $this->asBoolean($get('is_accountant')) === false && $this->asBoolean($get('has_cnpj')) === true)
                     ->dehydrateStateUsing(fn(?string $state): ?string => $this->normalizeCnpj((string) $state)),
 
                 TextInput::make('company_identifier')
-                    ->label('Identificador da empresa (CÓDIGO)')
+                    ->label(__('onboarding.client_register.company_identifier'))
                     ->maxLength(255)
                     ->live()
-                    ->visible(fn(callable $get): bool => $get('is_accountant') === false && $get('has_cnpj') === false)
-                    ->required(fn(callable $get): bool => $get('is_accountant') === false && $get('has_cnpj') === false)
+                    ->visible(fn(callable $get): bool => $this->asBoolean($get('is_accountant')) === false && $this->asBoolean($get('has_cnpj')) === false)
+                    ->required(fn(callable $get): bool => $this->asBoolean($get('is_accountant')) === false && $this->asBoolean($get('has_cnpj')) === false)
                     ->afterStateUpdated(function (callable $set, ?string $state): void {
                         $set('company_identifier', filled($state) ? Str::upper(trim($state)) : null);
                     })
@@ -161,7 +161,7 @@ class ClientRegister extends Register
 
             if (! $cnpj) {
                 throw ValidationException::withMessages([
-                    'data.accounting_cnpj' => 'Informe um CNPJ válido da contabilidade.',
+                    'data.accounting_cnpj' => __('onboarding.client_register.messages.invalid_accounting_cnpj'),
                 ]);
             }
 
@@ -175,7 +175,7 @@ class ClientRegister extends Register
 
             if (! $cnpj) {
                 throw ValidationException::withMessages([
-                    'data.company_cnpj' => 'Informe um CNPJ válido da empresa.',
+                    'data.company_cnpj' => __('onboarding.client_register.messages.invalid_company_cnpj'),
                 ]);
             }
 
@@ -186,7 +186,7 @@ class ClientRegister extends Register
 
         if ($identifier === '') {
             throw ValidationException::withMessages([
-                'data.company_identifier' => 'Informe o identificador da empresa.',
+                'data.company_identifier' => __('onboarding.client_register.messages.company_identifier_required'),
             ]);
         }
 
@@ -194,7 +194,7 @@ class ClientRegister extends Register
 
         if (! $company) {
             throw ValidationException::withMessages([
-                'data.company_identifier' => 'Empresa não encontrada para este identificador.',
+                'data.company_identifier' => __('onboarding.client_register.messages.company_not_found'),
             ]);
         }
 
@@ -211,7 +211,7 @@ class ClientRegister extends Register
             return $company;
         }
 
-        $defaultName = "Empresa {$cnpj}";
+        $defaultName = __('onboarding.client_register.default_company_name', ['cnpj' => $cnpj]);
         $baseSlug = Str::slug($defaultName);
         $slug = $baseSlug;
         $counter = 1;
@@ -240,5 +240,18 @@ class ClientRegister extends Register
         $digits = preg_replace('/\D+/', '', $value) ?? '';
 
         return strlen($digits) === 11 ? $digits : null;
+    }
+
+    protected function asBoolean(mixed $value): ?bool
+    {
+        if (in_array($value, [true, 1, '1', 'true', 'on', 'yes'], true)) {
+            return true;
+        }
+
+        if (in_array($value, [false, 0, '0', 'false', 'off', 'no'], true)) {
+            return false;
+        }
+
+        return null;
     }
 }

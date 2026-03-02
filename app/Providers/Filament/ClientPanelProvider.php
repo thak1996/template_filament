@@ -55,9 +55,9 @@ class ClientPanelProvider extends PanelProvider
             })
             ->navigationItems([
                 NavigationItem::make('company-settings')
-                    ->label('Dados da empresa')
+                    ->label(__('onboarding.navigation.company_settings'))
                     ->icon('heroicon-o-building-office')
-                    ->group('Configurações')
+                    ->group(__('onboarding.navigation.settings_group'))
                     ->sort(90)
                     ->url(function (): ?string {
                         if (Filament::getTenant()) {

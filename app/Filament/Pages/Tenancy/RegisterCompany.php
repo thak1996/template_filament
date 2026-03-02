@@ -15,7 +15,7 @@ class RegisterCompany extends RegisterTenant
 {
     public static function getLabel(): string
     {
-        return __('Cadastrar empresa');
+        return __('onboarding.company.register_label');
     }
 
     public static function canView(): bool
@@ -28,11 +28,11 @@ class RegisterCompany extends RegisterTenant
         return $form
             ->schema([
                 TextInput::make('name')
-                    ->label('Nome da empresa')
+                    ->label(__('onboarding.company.name'))
                     ->required()
                     ->maxLength(255),
                 TextInput::make('cnpj')
-                    ->label('CNPJ')
+                    ->label(__('onboarding.company.cnpj'))
                     ->required()
                     ->mask('99.999.999/9999-99')
                     ->maxLength(18)

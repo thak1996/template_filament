@@ -12,13 +12,13 @@ class ValidCpf implements ValidationRule
         $digits = preg_replace('/\D+/', '', (string) $value) ?? '';
 
         if (strlen($digits) !== 11) {
-            $fail('CPF inválido. Use o formato 000.000.000-00.');
+            $fail(__('onboarding.validation.cpf_format'));
 
             return;
         }
 
         if (preg_match('/^(\d)\1{10}$/', $digits)) {
-            $fail('CPF inválido. Use o formato 000.000.000-00.');
+            $fail(__('onboarding.validation.cpf_format'));
 
             return;
         }
@@ -33,7 +33,7 @@ class ValidCpf implements ValidationRule
             $digit = ((10 * $sum) % 11) % 10;
 
             if ((int) $digits[$t] !== $digit) {
-                $fail('CPF inválido. Verifique os dígitos informados.');
+                $fail(__('onboarding.validation.cpf_digits'));
 
                 return;
             }

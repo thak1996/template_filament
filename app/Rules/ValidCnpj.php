@@ -12,13 +12,13 @@ class ValidCnpj implements ValidationRule
         $digits = preg_replace('/\D+/', '', (string) $value) ?? '';
 
         if (strlen($digits) !== 14) {
-            $fail('CNPJ inválido. Use o formato 00.000.000/0000-00.');
+            $fail(__('onboarding.validation.cnpj_format'));
 
             return;
         }
 
         if (preg_match('/^(\d)\1{13}$/', $digits)) {
-            $fail('CNPJ inválido. Use o formato 00.000.000/0000-00.');
+            $fail(__('onboarding.validation.cnpj_format'));
 
             return;
         }
@@ -35,7 +35,7 @@ class ValidCnpj implements ValidationRule
         $digitOne = $digitOne < 2 ? 0 : 11 - $digitOne;
 
         if ((int) $digits[12] !== $digitOne) {
-            $fail('CNPJ inválido. Verifique os dígitos informados.');
+            $fail(__('onboarding.validation.cnpj_digits'));
 
             return;
         }
@@ -49,7 +49,7 @@ class ValidCnpj implements ValidationRule
         $digitTwo = $digitTwo < 2 ? 0 : 11 - $digitTwo;
 
         if ((int) $digits[13] !== $digitTwo) {
-            $fail('CNPJ inválido. Verifique os dígitos informados.');
+            $fail(__('onboarding.validation.cnpj_digits'));
         }
     }
 }

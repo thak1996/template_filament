@@ -11,7 +11,7 @@ enum PanelIdEnum: string
     {
         return match ($this) {
             self::ADMIN => 'admin',
-            self::CLIENT => '',
+            self::CLIENT => 'app',
         };
     }
 }

@@ -14,7 +14,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\MenuItem;
+use Filament\Navigation\NavigationItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -52,10 +52,12 @@ class ClientPanelProvider extends PanelProvider
 
                 return count($user->getTenants(Filament::getCurrentPanel())) > 1;
             })
-            ->userMenuItems([
-                MenuItem::make()
+            ->navigationItems([
+                NavigationItem::make('company-settings')
                     ->label('Dados da empresa')
                     ->icon('heroicon-o-building-office')
+                    ->group('Configurações')
+                    ->sort(90)
                     ->url(function (): ?string {
                         if (Filament::getTenant()) {
                             return Filament::getTenantProfileUrl();
